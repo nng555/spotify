@@ -50,10 +50,6 @@ list_of_distances = []
 
 for a, b in itertools.combinations(track_list, 2):
     dist = distance_between_two_tracks(track_list.index(a), track_list.index(b))
-    '''
-    print(a['name'], b['name'], 'indexes are ', track_list.index(a), track_list.index(b))
-    print('euclidean distance between them is ', dist)
-    '''
     list_of_distances.append(dist)
 
 print ('average euclidean distance      ', np.mean(list_of_distances))
