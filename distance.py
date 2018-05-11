@@ -4,8 +4,14 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import json
+import glob
 import sys
 import itertools
+from scipy.spatial import distance
+import numpy as np
+import numpy as np
+import matplotlib.pyplot as plt
+
 
 SPOTIPY_CLIENT_ID = '4192c5a6adeb4aa3966c78a1e81bfa21'
 SPOTIPY_CLIENT_SECRET = '109a60c3fc5e4eefbd894935984f09d3'
@@ -15,46 +21,77 @@ client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_I
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 sp.trace=False
 
-from scipy.spatial import distance
-import numpy as np
 
-track_features = []
+#methods
 
-def make_array_features(track_index):
+def make_list_of_features(playlist):
+    list_of_features = []
+    playlist = playlist['tracks']
+    for track in playlist:
+        list_of_features.extend(sp.audio_features(str(track['id'])))
+    return list_of_features
+
+def track_to_array(track_index, list_of_features):
     track_array = []
-    track = track_features[track_index]
+    track = list_of_features[track_index]
     track_array.append(track['liveness'])
     track_array.append(track['valence'])
     track_array.append(track['energy'])
     track_array.append(track['danceability'])
     track_array.append(track['speechiness'])
     track_array.append(track['instrumentalness'])
+    track_array.append(track['tempo'])
+    track_array.append(track['key'])
+    track_array.append(track['mode'])
+    track_array.append(track['time_signature'])
+    track_array.append(track['loudness'])
+    track_array.append(track['duration_ms'])
     return track_array
 
-def distance_between_two_tracks(track1index, track2index):
-    track1array = make_array_features(track1index)
-    track2array = make_array_features(track2index)
-    dist = distance.euclidean(track1array, track2array)
+def dist_between_pair(track_array1, track_array2):
+    dist = distance.euclidean(track_array1, track_array2)
     return dist
 
-if len(sys.argv) > 1:
-    playlist = sys.argv[1]
-data = json.load(open(playlist))
-track_list = data['tracks']
-filename = data['tracks'][0]['name'] + "_playlist_distances.json"
+def get_average_dist_playlist(playlist):
+    list_of_distances = []
+    features = make_list_of_features(playlist)
+    for a, b in itertools.combinations(features, 2): # get all the distances between all pairs
+        first_track = track_to_array(features.index(a), features)
+        second_track = track_to_array(features.index(b), features)
+        dist = dist_between_pair(first_track, second_track)
+        list_of_distances.append(dist)
+    average_dist = np.mean(list_of_distances)
+    print ('average euclidean dist for playlist is ', average_dist)
+    return average_dist
 
-for i in track_list:
-    track_features.extend(sp.audio_features(str(i['id'])))
+def get_name_and_dist(playlist, file_name):
+    dist = get_average_dist_playlist(playlist)
+    name = file_name
+    return file_name, dist
+#####################################################################
 
-list_of_distances = []
+list_of_files = glob.glob('./*.json')
+results = []
+for file_name in list_of_files[:3]:
+    data = json.load(open(file_name))
+    print ('getting average distance for playlist ', file_name)
+    results.append(get_name_and_dist(data, file_name))
 
-for a, b in itertools.combinations(track_list, 2):
-    dist = distance_between_two_tracks(track_list.index(a), track_list.index(b))
-    list_of_distances.append(dist)
+labels, ys = zip(*results)
+xs = np.arange(len(labels))
+width = .2
 
-print ('average euclidean distance      ', np.mean(list_of_distances))
+fig = plt.figure()
+ax = fig.gca()  #get current axes
+ax.bar(xs, ys, width, align='center')
 
-with open(filename, 'w') as outfile:
-    print ('outputting file named ')
-    print filename
-    json.dump(list_of_distances, outfile)
+#Remove the default x-axis tick numbers and
+#use tick numbers of your own choosing:
+ax.set_xticks(xs)
+#Replace the tick numbers with strings:
+ax.set_xticklabels(labels)
+#Remove the default y-axis tick numbers and
+#use tick numbers of your own choosing:
+ax.set_yticks(ys)
+
+plt.savefig('distances.png')
