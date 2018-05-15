@@ -41,11 +41,13 @@ def track_to_array(track_index, list_of_features):
     track_array.append(track['speechiness'])
     track_array.append(track['instrumentalness'])
     track_array.append(track['tempo'])
-    track_array.append(track['key'])
-    track_array.append(track['mode'])
-    track_array.append(track['time_signature'])
+    #track_array.append(track['key'])
+    #track_array.append(track['mode'])
+    #track_array.append(track['time_signature'])
     track_array.append(track['loudness'])
     track_array.append(track['duration_ms'])
+    track_array.append(track['popularity'])
+    track_array.append(track['acousticness'])
     return track_array
 
 def dist_between_pair(track_array1, track_array2):
@@ -60,7 +62,7 @@ def get_average_dist_playlist(playlist):
         second_track = track_to_array(features.index(b), features)
         dist = dist_between_pair(first_track, second_track)
         list_of_distances.append(dist)
-    average_dist = np.mean(list_of_distances)
+
     print ('average euclidean dist for playlist is ', average_dist)
     return average_dist
 
