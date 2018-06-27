@@ -22,8 +22,8 @@ if len(sys.argv) > 1:
     track_name = sys.argv[1]
     number_recommendations = (sys.argv[2])
 else:
-    track_name = 'unbelievable'
-    number_recommendations = 10
+    track_name = 'autumn leaves'
+    number_recommendations = 50
 # get track ID from name
 results = sp.search(q='track:' + track_name, type='track')
 possible_tracks = results['tracks']['items']
