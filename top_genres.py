@@ -2,6 +2,7 @@
 reads in an track name and a specified number of recommendations, outputs recommended tracks to .json file
 '''
 import spotipy
+import pprint
 from optparse import OptionParser
 from spotipy.oauth2 import SpotifyClientCredentials
 import json
@@ -17,14 +18,25 @@ client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_I
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 sp.trace=False
 
-with open('rand_sample.json', 'rb') as of:
-   tracks = json.load(of)
+uri = 'spotify:user:spotify:playlist:37i9dQZF1DX5nwnRMcdReF'
+
+results = sp.user_playlist_tracks(uri.split(':')[2], uri.split(':')[4])
+tracks = results['items']
+
+pp = pprint.PrettyPrinter(indent=3)
+
+# Loops to ensure I get every track of the playlist
+while results['next']:
+   results = sp.next(results)
+   tracks.extend(results['items'])
 
 genres = {}
 
 i = 0
 for track in tracks:
-   track_id = track[0]
+   track_info = track['track']
+   #pp.pprint(track_info)
+   track_id = track_info['id']
    info = sp.track(track_id)
    artist = sp.artist(info['artists'][0]['uri'])
    for genre in artist['genres']:
