@@ -11,7 +11,7 @@ SPOTIPY_CLIENT_ID = '7c241d674ee243ab88e80c1d183a3e7e'
 SPOTIPY_CLIENT_SECRET = 'de6e84f97a5e4162b854ec92f743c3c5'
 SPOTIPY_REDIRECT_URI = 'http://localhost/'
 
-username = 'spotifydummy66@gmail.com'
+username = 'spotifydummy67@gmail.com'
 scope = "user-read-playback-state"
 
 token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)

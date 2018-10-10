@@ -8,21 +8,34 @@ import json
 import time
 import sys
 import matplotlib.pyplot as plt
+import spotipy.util as util
 
-SPOTIPY_CLIENT_ID = '4192c5a6adeb4aa3966c78a1e81bfa21'
-SPOTIPY_CLIENT_SECRET = '109a60c3fc5e4eefbd894935984f09d3'
+SPOTIPY_CLIENT_ID = '7c241d674ee243ab88e80c1d183a3e7e'
+SPOTIPY_CLIENT_SECRET = 'de6e84f97a5e4162b854ec92f743c3c5'
 SPOTIPY_REDIRECT_URI = 'http://localhost/'
 
-client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_CLIENT_SECRET)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+username = 'spotifydummy66@gmail.com'
+scope = 'playlist-modify-public'
+
+
+token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
+
+sp = spotipy.Spotify(auth=token)
 sp.trace=False
 
 # get all genres, get recommendations for each genre, output to file
-seeds = sp.recommendation_genre_seeds()
-print(type(seeds['genres']))
-for i in (seeds['genres']):
-    tracks = sp.recommendations(seed_genres =[i], limit=100)
-    print('outputting playlist for genre ' + i)
-    filename = i + "_seeded_tracks.json"
-    with open(filename, 'w') as outfile:
-        json.dump(tracks, outfile)
+top = ['pop','hip-hop','edm','r-n-b','rock']
+uris = ['spotify:user:idw1dm34y0wlm9sjyi56hl2fq:playlist:1t9GGtdzqrOGa4SorE9M7q',
+      'spotify:user:idw1dm34y0wlm9sjyi56hl2fq:playlist:3LR7jjBL7dv6O6qU7UXKNK',
+      'spotify:user:idw1dm34y0wlm9sjyi56hl2fq:playlist:35IkzXk53IGDYQNLpECDEg',
+      'spotify:user:idw1dm34y0wlm9sjyi56hl2fq:playlist:66meeNXPnRN0AfgMrbPiMM',
+      'spotify:user:idw1dm34y0wlm9sjyi56hl2fq:playlist:7bRUUBhHkH2Smv2h0hAyzH']
+
+for g, puri in zip(top, uris):
+   if g in ['pop', 'hip-hop', 'edm', 'r-n-b']:
+      continue
+   tracks = sp.recommendations(seed_genres =[g], limit=100)
+   user = puri.split(':')[2]
+   pid = puri.split(':')[4]
+   for track in tracks['tracks']:
+      sp.user_playlist_add_tracks(user, pid, tracks=[track['uri']])
