@@ -7,11 +7,14 @@ import time
 import sys
 import os
 
-SPOTIPY_CLIENT_ID = '7c241d674ee243ab88e80c1d183a3e7e'
-SPOTIPY_CLIENT_SECRET = 'de6e84f97a5e4162b854ec92f743c3c5'
+logins = json.load(open('login.json', 'wb'))
+user = 0
+
+SPOTIPY_CLIENT_ID = logins[user][1]
+SPOTIPY_CLIENT_SECRET = logins[user][2]
 SPOTIPY_REDIRECT_URI = 'http://localhost/'
 
-username = 'spotifydummy67@gmail.com'
+username = logins[user][0]
 scope = "user-read-playback-state"
 
 token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
