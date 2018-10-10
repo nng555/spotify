@@ -28,15 +28,20 @@ while(True):
    try:
       track = sp.current_playback()
       if track is None:
+         time.sleep(30)
          continue
-      if track['item'] is None:
+      if track.get('item') is None:
+         time.sleep(30)
+         continue
+      if track['item'].get('id') is None:
+         time.sleep(30)
          continue
       if track['item']['id'] not in played:
          played.append(track['item']['id'])
          print "Playing " + track['item']['name'] + ' by ' + track['item']['artists'][0]['name']
          with open('history.json', 'wb') as of:
             json.dump(played, of)
-      time.sleep(1)
+      time.sleep(30)
    except spotipy.client.SpotifyException:
       token = util.prompt_for_user_token(username, scope, SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, SPOTIPY_REDIRECT_URI)
 
@@ -45,10 +50,17 @@ while(True):
 
       track = sp.current_playback()
       if track is None:
+         time.sleep(30)
+         continue
+      if track.get('item') is None:
+         time.sleep(30)
+         continue
+      if track['item'].get('id') is None:
+         time.sleep(30)
          continue
       if track['item']['id'] not in played:
          played.append(track['item']['id'])
          print "Playing " + track['item']['name'] + ' by ' + track['item']['artists'][0]['name']
          with open('history.json', 'wb') as of:
             json.dump(played, of)
-      time.sleep(5)
+      time.sleep(30)
